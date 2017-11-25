@@ -13,7 +13,7 @@ namespace TryCatchAdder.ConsoleApp
         {
             var fileLocation = ConfigurationManager.AppSettings["fileLocation"];
             var sourceCode = new CSharpFileReader().GetContentsFromCSharpCodeFile(fileLocation);
-            var allPublicMethods = new CSharpCodeAnalyzer().GetPublicMethodsInClass(sourceCode);
+            var allPublicMethods = new CSharpCodeAnalyzer().GetPublicMethodsWithoutCatchClauseInClass(sourceCode);
             Console.ReadKey();
         }
     }

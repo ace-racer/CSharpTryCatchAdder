@@ -15,17 +15,17 @@ namespace TryCatchAdder.ConsoleApp
         /// <summary>
         /// The public string
         /// </summary>
-        private const string PublicString = "public";
+        private const string PublicString = "public";       
 
         /// <summary>
         /// Gets the public methods in class.
         /// </summary>
         /// <param name="code">The code.</param>
-        public List<MethodDeclarationSyntax> GetPublicMethodsInClass(string code)
+        public List<MethodDeclarationSyntax> GetPublicMethodsWithoutCatchClauseInClass(string code)
         {
-            var publicMethods = new List<MethodDeclarationSyntax>();
+            var publicMethodsToCorrect = new List<MethodDeclarationSyntax>();
             try
-            {                
+            {
                 if (!string.IsNullOrWhiteSpace(code))
                 {
                     SyntaxTree tree = CSharpSyntaxTree.ParseText(code);
@@ -41,8 +41,22 @@ namespace TryCatchAdder.ConsoleApp
                             var modifiers = method.Modifiers.ToList();
                             if (modifiers.Any(s => string.Compare(s.ValueText, PublicString) == 0))
                             {
-                                Console.WriteLine("Current method is public");
-                                publicMethods.Add(method);
+                                Console.WriteLine("     Current method is public");
+                                var catchClauses = method.DescendantNodesAndSelf().OfType<CatchClauseSyntax>();
+                                var catchBlock = catchClauses.Select(n => n.DescendantNodes().OfType<BlockSyntax>().FirstOrDefault());
+                                if (catchBlock != null && catchBlock.Count() == 0)
+                                {
+                                    Console.WriteLine("             Current method has no catch clause...");
+                                    publicMethodsToCorrect.Add(method);
+                                }
+                                else
+                                {
+                                    Console.WriteLine("             Current method has catch clause...");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("     Current method is not public");
                             }
                         }
                     }
@@ -53,7 +67,7 @@ namespace TryCatchAdder.ConsoleApp
                 Console.WriteLine("Error: " + ex.Message);
             }
 
-            return publicMethods;
+            return publicMethodsToCorrect;
         }
     }
 }
