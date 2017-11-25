@@ -1,0 +1,1 @@
+# A project to add try catch blocks to public methods to help developers with exception handling in their C# code #
